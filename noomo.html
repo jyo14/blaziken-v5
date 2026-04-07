@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=neue-machina@400,500,700,800&display=swap" rel="stylesheet">
 <style>
   :root{
     --fg:#0a0a0a;
@@ -53,24 +54,25 @@
     padding:30px 44px;
   }
   nav .logo{
-    font-family:"Geist",sans-serif;
+    font-family:"Neue Machina","Geist",sans-serif;
     font-size:22px;font-weight:800;letter-spacing:-.04em;
-    color:#0a0a0a;line-height:1;
+    color:#000;line-height:1;
     text-transform:lowercase;
   }
   nav .links{
     display:flex;gap:44px;
-    font-family:"Geist",sans-serif;
+    font-family:"Neue Machina","Geist",sans-serif;
     font-size:12px;letter-spacing:.14em;text-transform:uppercase;
-    font-weight:500;color:#0a0a0a;
+    font-weight:500;color:#000;
   }
   nav .links a{
     position:relative;
+    color:#000;
     transition:opacity .25s;
   }
   nav .links a::after{
     content:"";position:absolute;left:0;right:0;bottom:-6px;
-    height:1px;background:#0a0a0a;
+    height:1px;background:#000;
     transform:scaleX(0);transform-origin:left;
     transition:transform .35s cubic-bezier(.65,0,.35,1);
   }
@@ -85,11 +87,11 @@
   }
   h1{
     width:100%;
-    font-family:"Geist",sans-serif;
+    font-family:"Neue Machina","Geist",sans-serif;
     font-weight:800;
-    font-size:clamp(48px,9.4vw,168px);
-    line-height:.92;
-    letter-spacing:-.04em;
+    font-size:clamp(40px,7.4vw,128px);
+    line-height:.95;
+    letter-spacing:-.03em;
     color:#0a0a0a;
   }
   h1 .line{
