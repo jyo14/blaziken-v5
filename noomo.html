@@ -216,48 +216,50 @@ camera.position.set(0, 0, 6);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-// ── Chrome sculptures: small stacked metallic objects ─
-const chrome = new THREE.MeshStandardMaterial({
-  color: 0xffffff,
-  metalness: 1.0,
-  roughness: 0.08,
-  envMapIntensity: 1.5,
+// ── Frosted-glass cluster sculptures (matches noomo's pastel chrome) ─
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color: 0xeaecf2,
+  metalness: 0.15,
+  roughness: 0.32,
+  transmission: 0.55,
+  thickness: 0.6,
+  ior: 1.35,
+  transparent: true,
+  opacity: 0.9,
+  clearcoat: 0.6,
+  clearcoatRoughness: 0.25,
+  envMapIntensity: 0.7,
 });
 
-// Build a small sculpture: a few stacked rounded cylinders / capsules
+// Build a small cluster of overlapping rounded forms (spheres + soft caps)
 function buildCluster(){
   const group = new THREE.Group();
-  const heights = [0.55, 0.42, 0.36, 0.3];
-  let y = 0;
-  heights.forEach((h, i) => {
-    const r = 0.28 - i * 0.015;
-    const geo = new THREE.CylinderGeometry(r, r, h, 48, 1, false);
-    const mesh = new THREE.Mesh(geo, chrome);
-    mesh.position.y = y + h / 2;
-    y += h + 0.04;
-    group.add(mesh);
-    // Cap (small torus on top of each)
-    const torus = new THREE.Mesh(
-      new THREE.TorusGeometry(r * 0.9, 0.025, 16, 48),
-      chrome
+  const layout = [
+    { r: 0.34, x: -0.18, y:  0.28, z:  0.0 },
+    { r: 0.30, x:  0.18, y:  0.16, z:  0.1 },
+    { r: 0.28, x: -0.05, y: -0.12, z: -0.05 },
+    { r: 0.26, x:  0.22, y: -0.30, z:  0.08 },
+    { r: 0.22, x: -0.22, y: -0.34, z:  0.0 },
+  ];
+  layout.forEach(o => {
+    const m = new THREE.Mesh(
+      new THREE.SphereGeometry(o.r, 48, 48),
+      glassMat
     );
-    torus.position.y = mesh.position.y + h / 2;
-    torus.rotation.x = Math.PI / 2;
-    group.add(torus);
+    m.position.set(o.x, o.y, o.z);
+    group.add(m);
   });
-  // Centre the group vertically
-  group.children.forEach(c => (c.position.y -= y / 2));
   return group;
 }
 
 const clusterA = buildCluster();
-clusterA.position.set(-2.6, 1.0, 0);
-clusterA.scale.set(0.85, 0.85, 0.85);
+clusterA.position.set(-2.7, 1.05, 0);
+clusterA.scale.set(0.95, 0.95, 0.95);
 scene.add(clusterA);
 
 const clusterB = buildCluster();
-clusterB.position.set(0.7, -0.7, 0.4);
-clusterB.scale.set(0.95, 0.95, 0.95);
+clusterB.position.set(0.7, -0.85, 0.3);
+clusterB.scale.set(1.0, 1.0, 1.0);
 scene.add(clusterB);
 
 // Soft fill light (mostly env handles it)
