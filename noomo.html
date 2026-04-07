@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Blaziken — Noomo-style hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --fg:#f1f1ef;
+    --muted:#8a8a86;
+    --accent:#5cc26b;
+    --accent-soft:rgba(92,194,107,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    background:var(--bg);color:var(--fg);
+    font-family:"Geist","Inter",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--accent);color:#000}
+  a{color:inherit;text-decoration:none}
+
+  /* ── HUD bar ─────────────────────────────── */
+  .hud{
+    position:fixed;top:0;left:0;right:0;z-index:30;
+    display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;
+    padding:22px 32px;
+    font-family:"Geist Mono",monospace;
+    font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+    color:#888;
+    mix-blend-mode:difference;
+  }
+  .hud .l,.hud .c,.hud .r{display:flex;align-items:center;gap:14px}
+  .hud .c{justify-content:center}
+  .hud .r{justify-content:flex-end}
+  .hud .brand{color:#fff;font-weight:600;letter-spacing:.06em}
+  .hud .live{display:inline-flex;align-items:center;gap:8px;color:#bbb}
+  .hud .live::before{
+    content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+
+  /* ── Hero ────────────────────────────────── */
+  .hero{
+    position:relative;
+    min-height:100vh;width:100%;
+    padding:120px 32px 80px;
+    display:grid;grid-template-columns:1.05fr 1fr;gap:60px;align-items:center;
+  }
+  .hero-text{position:relative;z-index:2;max-width:780px}
+  .eyebrow{
+    font-family:"Geist Mono",monospace;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:#888;margin-bottom:32px;
+    display:inline-flex;align-items:center;gap:12px;
+  }
+  .eyebrow::before{
+    content:"";width:32px;height:1px;background:#666;
+  }
+  .eyebrow .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+
+  h1.headline{
+    font-family:"Geist",sans-serif;
+    font-size:clamp(56px,8.4vw,148px);
+    font-weight:500;letter-spacing:-.045em;line-height:.92;
+    color:#f1f1ef;
+  }
+  h1.headline .line{display:block;overflow:hidden}
+  h1.headline .line > span{
+    display:inline-block;
+    transform:translateY(110%);
+    will-change:transform;
+  }
+  h1.headline em{
+    font-family:"Instrument Serif",serif;
+    font-style:italic;font-weight:400;
+    color:var(--accent);
+    letter-spacing:-.02em;
+  }
+
+  .hero-sub{
+    margin-top:42px;
+    font-size:17px;line-height:1.55;color:#999;max-width:46ch;
+    opacity:0;transform:translateY(20px);
+  }
+
+  .hero-cta{
+    margin-top:44px;
+    display:inline-flex;align-items:center;gap:16px;
+    padding:18px 30px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.18);
+    background:transparent;color:#f1f1ef;cursor:pointer;
+    font-family:"Geist",sans-serif;font-size:15px;font-weight:500;
+    position:relative;overflow:hidden;isolation:isolate;
+    transition:color .4s, border-color .4s;
+    opacity:0;transform:translateY(20px);
+  }
+  .hero-cta::before{
+    content:"";position:absolute;inset:0;
+    background:var(--accent);transform:translateX(-101%);
+    transition:transform .55s cubic-bezier(.65,0,.35,1);
+    z-index:-1;
+  }
+  .hero-cta:hover::before{transform:translateX(0)}
+  .hero-cta:hover{color:#000;border-color:var(--accent)}
+  .hero-cta .arrow{
+    display:inline-flex;width:20px;height:20px;
+    transition:transform .4s cubic-bezier(.2,.8,.2,1);
+  }
+  .hero-cta:hover .arrow{transform:translateX(6px) rotate(-45deg)}
+
+  /* ── WebGL canvas ────────────────────────── */
+  .hero-gl{
+    position:relative;
+    aspect-ratio: 4/5;
+    border-radius:6px;
+    overflow:hidden;
+    background:#111;
+    box-shadow:0 40px 100px rgba(0,0,0,.4);
+  }
+  .hero-gl canvas{display:block;width:100%;height:100%}
+  .hero-gl::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg, transparent 60%, rgba(0,0,0,.4));
+    pointer-events:none;
+  }
+  .hero-gl .meta{
+    position:absolute;left:24px;bottom:20px;right:24px;
+    display:flex;justify-content:space-between;
+    font-family:"Geist Mono",monospace;
+    font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+    color:rgba(255,255,255,.7);z-index:2;
+  }
+  .hero-gl .meta strong{color:#fff;font-weight:500}
+
+  /* ── Vertical edge label ─────────────────── */
+  .edge{
+    position:fixed;left:18px;top:50%;
+    transform:translateY(-50%) rotate(-90deg);
+    transform-origin:left center;
+    font-family:"Geist Mono",monospace;
+    font-size:10px;letter-spacing:.3em;text-transform:uppercase;
+    color:#666;z-index:20;white-space:nowrap;
+  }
+  .edge::before{
+    content:"";display:inline-block;width:24px;height:1px;
+    background:#666;vertical-align:middle;margin-right:12px;
+  }
+
+  /* ── Marquee at bottom ───────────────────── */
+  .marquee{
+    position:relative;z-index:2;
+    border-top:1px solid rgba(255,255,255,.08);
+    border-bottom:1px solid rgba(255,255,255,.08);
+    padding:28px 0;overflow:hidden;
+    display:flex;gap:60px;
+    white-space:nowrap;
+    font-family:"Geist",sans-serif;
+    font-size:clamp(40px,6.6vw,108px);
+    font-weight:500;letter-spacing:-.04em;
+    -webkit-text-stroke:1px #555;
+    -webkit-text-fill-color:transparent;
+    animation:marquee 32s linear infinite;
+  }
+  .marquee em{
+    font-family:"Instrument Serif",serif;
+    font-style:italic;
+    -webkit-text-stroke:0;
+    -webkit-text-fill-color:var(--accent);
+  }
+  .marquee span{display:inline-flex;align-items:center;gap:60px}
+  .marquee .dot{
+    display:inline-block;width:18px;height:18px;border-radius:50%;
+    background:var(--accent);flex-shrink:0;
+    -webkit-text-stroke:0;
+  }
+  @keyframes marquee{
+    from{transform:translateX(0)}
+    to{transform:translateX(-50%)}
+  }
+
+  /* Custom cursor */
+  .cursor{
+    position:fixed;top:0;left:0;width:14px;height:14px;border-radius:50%;
+    background:var(--accent);pointer-events:none;z-index:100;
+    transform:translate(-50%,-50%);
+    mix-blend-mode:difference;
+    transition:width .25s,height .25s;
+  }
+  .cursor.lg{width:60px;height:60px}
+
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;gap:40px;padding-top:90px}
+    .hero-gl{order:-1;max-width:420px}
+    .edge{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="l">
+    <span class="brand">BLAZIKEN</span>
+    <span>/V5.NOOMO</span>
+    <span class="live">SYS · ONLINE</span>
+  </div>
+  <div class="c"><span id="hudClock">00:00:00</span></div>
+  <div class="r">
+    <span>WORK</span><span>·</span><span>STUDIO</span><span>·</span><span>CONTACT</span>
+  </div>
+</div>
+
+<div class="edge">AI-NATIVE / TECH STARTUP — EST. 2024</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="eyebrow"><span class="dot"></span> Available for new projects</div>
+    <h1 class="headline">
+      <span class="line"><span>Building</span></span>
+      <span class="line"><span><em>intelligent</em></span></span>
+      <span class="line"><span>systems</span></span>
+      <span class="line"><span>that think.</span></span>
+    </h1>
+    <p class="hero-sub" id="heroSub">
+      A Mumbai-based studio shipping AI-native software for businesses ready to evolve. We design with intent, code with rigor, and treat intelligence as a first-class material.
+    </p>
+    <button class="hero-cta" id="heroCta" type="button">
+      View selected work
+      <span class="arrow">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 10h13M10 4l6 6-6 6"/></svg>
+      </span>
+    </button>
+  </div>
+
+  <div class="hero-gl" id="heroGl" data-cursor="lg">
+    <canvas id="glCanvas"></canvas>
+    <div class="meta">
+      <strong>SURVEY INSIGHTS · 2025</strong>
+      <span>91% ACCURACY</span>
+    </div>
+  </div>
+</section>
+
+<!-- Bottom marquee -->
+<div class="marquee" aria-hidden="true">
+  <span>Building <em>intelligent</em> systems<span class="dot"></span>Building <em>intelligent</em> systems<span class="dot"></span>Building <em>intelligent</em> systems<span class="dot"></span>Building <em>intelligent</em> systems<span class="dot"></span></span>
+  <span>Building <em>intelligent</em> systems<span class="dot"></span>Building <em>intelligent</em> systems<span class="dot"></span>Building <em>intelligent</em> systems<span class="dot"></span>Building <em>intelligent</em> systems<span class="dot"></span></span>
+</div>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.0.42/dist/lenis.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+
+<!-- Smooth scroll + clock + cursor -->
+<script>
+// Lenis smooth scroll
+const lenis = new Lenis({ lerp: 0.085, smoothWheel: true });
+function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+requestAnimationFrame(raf);
+
+// Live clock
+(() => {
+  const el = document.getElementById('hudClock');
+  const pad = n => String(n).padStart(2,'0');
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace('_',' ').toUpperCase();
+  function tick(){
+    const d = new Date();
+    el.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${tz}`;
+    setTimeout(tick, 1000);
+  }
+  tick();
+})();
+
+// Custom cursor
+(() => {
+  const cursor = document.getElementById('cursor');
+  let x = innerWidth/2, y = innerHeight/2, tx = x, ty = y;
+  window.addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; });
+  function loop(){
+    x += (tx - x) * 0.18; y += (ty - y) * 0.18;
+    cursor.style.transform = `translate(${x}px,${y}px) translate(-50%,-50%)`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+  document.querySelectorAll('[data-cursor="lg"]').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('lg'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('lg'));
+  });
+})();
+
+// GSAP intro reveal
+gsap.set('.headline .line > span', { y: '110%' });
+const tl = gsap.timeline({ delay: 0.3, defaults: { ease: 'expo.out' } });
+tl.to('.headline .line > span', { y: '0%', duration: 1.3, stagger: 0.08 })
+  .to('#heroSub',  { opacity: 1, y: 0, duration: 1 }, '-=0.8')
+  .to('#heroCta',  { opacity: 1, y: 0, duration: 0.9 }, '-=0.7');
+</script>
+
+<!-- Three.js: displaced image plane -->
+<script type="module">
+import * as THREE from 'three';
+
+const wrap = document.getElementById('heroGl');
+const canvas = document.getElementById('glCanvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+const scene  = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+camera.position.z = 1;
+
+// Image texture (procedurally generated dark tech mockup canvas)
+function buildTexture(){
+  const c = document.createElement('canvas');
+  c.width = 800; c.height = 1000;
+  const g = c.getContext('2d');
+  // bg
+  const bg = g.createLinearGradient(0,0,800,1000);
+  bg.addColorStop(0,'#0a0a14'); bg.addColorStop(1,'#13131f');
+  g.fillStyle = bg; g.fillRect(0,0,800,1000);
+  // glow
+  const glow = g.createRadialGradient(220,260,20,220,260,500);
+  glow.addColorStop(0,'rgba(124,58,237,.55)'); glow.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle = glow; g.fillRect(0,0,800,1000);
+  const glow2 = g.createRadialGradient(620,780,20,620,780,500);
+  glow2.addColorStop(0,'rgba(92,194,107,.4)'); glow2.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle = glow2; g.fillRect(0,0,800,1000);
+  // floating pill
+  g.fillStyle = '#1a1a28'; g.strokeStyle = 'rgba(167,139,250,.5)'; g.lineWidth = 2;
+  roundRect(g, 80, 140, 280, 56, 14); g.fill(); g.stroke();
+  g.fillStyle = '#a78bfa'; g.beginPath(); g.arc(110, 168, 5, 0, Math.PI*2); g.fill();
+  g.fillStyle = '#e0d4ff'; g.font = '600 18px ui-monospace,monospace';
+  g.fillText('91% accuracy', 130, 175);
+  // main card
+  g.fillStyle = '#13131f'; g.strokeStyle = 'rgba(255,255,255,.1)'; g.lineWidth = 1;
+  roundRect(g, 100, 260, 600, 560, 18); g.fill(); g.stroke();
+  // card title
+  g.fillStyle = '#9ca3af'; g.font = '500 16px ui-monospace,monospace';
+  g.fillText('RESPONSES / Q3', 130, 304);
+  g.fillStyle = '#fff'; g.font = '600 56px Geist,sans-serif';
+  g.fillText('2,847', 130, 364);
+  // bars
+  const bars = [.55,.78,.95,.7,.85,.5,.4];
+  bars.forEach((h,i) => {
+    const x = 130 + i*68, bh = h * 360, y = 760 - bh;
+    const op = 0.35 + i * 0.08;
+    g.fillStyle = `rgba(167,139,250,${op})`;
+    roundRect(g, x, y, 50, bh, 6); g.fill();
+  });
+  // bottom mono
+  g.fillStyle = '#5cc26b'; g.font = '500 14px ui-monospace,monospace';
+  g.fillText('+ 12.4% WoW', 130, 800);
+  return new THREE.CanvasTexture(c);
+}
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+}
+
+const texture = buildTexture();
+texture.minFilter = THREE.LinearFilter;
+
+const geo = new THREE.PlaneGeometry(2, 2, 64, 64);
+const mat = new THREE.ShaderMaterial({
+  uniforms:{
+    uTex:{value:texture},
+    uTime:{value:0},
+    uMouse:{value:new THREE.Vector2(0.5,0.5)},
+    uIntensity:{value:0},
+    uScroll:{value:0},
+  },
+  vertexShader:`
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform float uIntensity;
+    void main(){
+      vUv = uv;
+      vec3 p = position;
+      // gentle z-wave
+      p.z += sin(uv.y * 6.0 + uTime * 0.6) * 0.02 * (0.4 + uIntensity);
+      p.z += cos(uv.x * 5.0 + uTime * 0.4) * 0.02 * (0.4 + uIntensity);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0);
+    }
+  `,
+  fragmentShader:`
+    precision highp float;
+    varying vec2 vUv;
+    uniform sampler2D uTex;
+    uniform float uTime;
+    uniform vec2 uMouse;
+    uniform float uIntensity;
+    uniform float uScroll;
+
+    // Cheap pseudo-noise (sin-based)
+    float n2(vec2 p){
+      return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+    }
+    float smoothNoise(vec2 p){
+      vec2 i = floor(p), f = fract(p);
+      float a = n2(i), b = n2(i+vec2(1.,0.));
+      float c = n2(i+vec2(0.,1.)), d = n2(i+vec2(1.,1.));
+      vec2 u = f*f*(3.-2.*f);
+      return mix(mix(a,b,u.x), mix(c,d,u.x), u.y);
+    }
+
+    void main(){
+      vec2 uv = vUv;
+      float t = uTime * 0.25;
+
+      // Ambient warp
+      float nx = smoothNoise(uv * 4.0 + vec2(t, 0.0));
+      float ny = smoothNoise(uv * 4.0 + vec2(0.0, t));
+      vec2 warp = vec2(nx, ny) - 0.5;
+
+      // Mouse-driven ripple
+      vec2 m = uMouse;
+      vec2 dir = uv - m;
+      float dist = length(dir);
+      float ripple = exp(-dist * 6.0) * sin(dist * 30.0 - uTime * 4.0);
+
+      vec2 disp = warp * 0.025 + normalize(dir + 0.0001) * ripple * 0.02;
+      disp *= (0.4 + uIntensity);
+
+      // Chromatic split
+      float cAmt = 0.004 * (0.4 + uIntensity);
+      float r = texture2D(uTex, uv + disp + vec2(cAmt, 0.)).r;
+      float g = texture2D(uTex, uv + disp).g;
+      float b = texture2D(uTex, uv + disp - vec2(cAmt, 0.)).b;
+
+      vec3 col = vec3(r, g, b);
+
+      // Soft vignette
+      float v = smoothstep(1.1, 0.4, length(uv - 0.5));
+      col *= mix(0.7, 1.0, v);
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `
+});
+const mesh = new THREE.Mesh(geo, mat);
+scene.add(mesh);
+
+function resize(){
+  const r = wrap.getBoundingClientRect();
+  renderer.setSize(r.width, r.height, false);
+}
+new ResizeObserver(resize).observe(wrap);
+resize();
+
+// Mouse uniform
+const mouse = new THREE.Vector2(0.5, 0.5);
+const target = new THREE.Vector2(0.5, 0.5);
+let intensity = 0, intensityTarget = 0;
+wrap.addEventListener('pointermove', e => {
+  const r = wrap.getBoundingClientRect();
+  target.x = (e.clientX - r.left) / r.width;
+  target.y = 1.0 - (e.clientY - r.top) / r.height;
+  intensityTarget = 1.2;
+});
+wrap.addEventListener('pointerleave', () => { intensityTarget = 0; });
+
+const clock = new THREE.Clock();
+function tick(){
+  mat.uniforms.uTime.value = clock.getElapsedTime();
+  mouse.lerp(target, 0.08);
+  intensity += (intensityTarget - intensity) * 0.06;
+  mat.uniforms.uMouse.value.copy(mouse);
+  mat.uniforms.uIntensity.value = intensity;
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+tick();
+</script>
+</body>
+</html>
