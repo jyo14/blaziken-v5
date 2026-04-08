@@ -656,9 +656,9 @@
     <span>BLAZIKEN</span>
   </a>
   <div class="links">
-    <a href="#">WORK</a>
-    <a href="#">SERVICES</a>
-    <a href="#">CONNECT</a>
+    <a href="#sceneProjects" data-scroll="sceneProjects" data-offset="0.65">WORK</a>
+    <a href="#sceneServices" data-scroll="sceneServices" data-offset="0.55">SERVICES</a>
+    <a href="#sceneContact"  data-scroll="sceneContact"  data-offset="0.55">CONNECT</a>
   </div>
 </nav>
 
@@ -1037,6 +1037,18 @@ tick();
 
 // ── Trigger reveal once everything is ready ──────────
 requestAnimationFrame(() => document.body.classList.add('ready'));
+
+// ── Nav anchor scrolling — lands in each section's settled state ──
+document.querySelectorAll('nav .links a[data-scroll]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.getElementById(link.dataset.scroll);
+    if (!target) return;
+    const offset = parseFloat(link.dataset.offset) || 0;
+    const y = target.offsetTop + target.offsetHeight * offset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  });
+});
 
 // ── Services hover-image (cursor-followed reveal) ────
 (() => {
