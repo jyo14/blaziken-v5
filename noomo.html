@@ -146,7 +146,7 @@
   .scene-hero{
     position:absolute;left:44px;right:44px;top:50%;
     transform:translateY(-50%);
-    transform-origin:center center;
+    transform-origin:50% 0%;
     will-change:transform,opacity,filter;
     pointer-events:none;
     font-family:"Victor Mono",ui-monospace,monospace;
@@ -406,26 +406,23 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
     const scrolled = Math.min(Math.max(-r.top, 0), total);
     const p = total > 0 ? scrolled / total : 0;
 
-    // Hero exits: forward (scale up) + drop down + blur + fade  (0 → 0.55)
+    // Hero exits forward + DOWN (tunnel feel): rushes toward camera + drops below
     const hp = Math.min(p / 0.55, 1);
     const easedH = 1 - Math.pow(1 - hp, 3);
-    const heroScale = 1 + easedH * 0.55;
-    const heroY = easedH * 55; // vh below center
-    const heroBlur = easedH * 6;
-    // translateY(-50%) keeps it vertically centered; the vh-based offset moves it down
+    const heroScale = 1 + easedH * 1.6;        // 1 → 2.6 (rushes forward)
+    const heroY = easedH * 90;                  // 0 → 90vh (drops down off-screen)
+    const heroBlur = easedH * 10;
     sceneHero.style.transform =
       `translate(0, calc(-50% + ${heroY}vh)) scale(${heroScale})`;
-    sceneHero.style.opacity = String(1 - easedH);
+    sceneHero.style.opacity = String(1 - easedH * 1.05);
     sceneHero.style.filter = `blur(${heroBlur}px)`;
 
-    // Project enters: rises from depth + fade  (0.35 → 1)
+    // Project enters from depth: starts tiny + blurred, grows into place
     const pp = Math.max(0, (p - 0.35) / 0.65);
     const easedP = 1 - Math.pow(1 - pp, 3);
-    const projScale = 0.45 + easedP * 0.55;
-    const projY = (1 - easedP) * 18; // vh
-    const projBlur = (1 - easedP) * 8;
-    sceneProject.style.transform =
-      `translateY(${projY}vh) scale(${projScale})`;
+    const projScale = 0.18 + easedP * 0.82;     // 0.18 → 1 (rises from far)
+    const projBlur = (1 - easedP) * 14;
+    sceneProject.style.transform = `scale(${projScale})`;
     sceneProject.style.opacity = String(easedP);
     sceneProject.style.filter = `blur(${projBlur}px)`;
 
