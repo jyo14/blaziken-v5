@@ -138,6 +138,7 @@
     height:320vh;
     z-index:6;
   }
+  #sceneProjects2{ height:280vh; }
   .scene-sticky{
     position:sticky;top:0;
     height:100vh;width:100%;
@@ -331,6 +332,28 @@
   </div>
 </section>
 
+<!-- Project 2 scroll runway -->
+<section class="scene-projects" id="sceneProjects2"></section>
+
+<!-- Project 2 fixed layers -->
+<div class="scene-project" id="sceneProject2">
+  <div class="proj-label">02 — SELECTED WORK</div>
+  <h2 class="proj-title">SALES CALL ANALYZER</h2>
+  <div class="proj-meta">2025 · 200+ CALLS / WEEK · LIVE TRANSCRIBE</div>
+</div>
+
+<div class="proj-extras" id="projExtras2">
+  <div class="left">
+    <span class="pill">Case Study</span>
+    <span>Speech · NLP · Sentiment</span>
+  </div>
+  <button class="cta" type="button">View project →</button>
+  <div class="right">
+    <strong>Blaziken Labs</strong>
+    Speech-to-insight pipeline scoring sentiment, objections, and intent across hundreds of weekly sales calls.
+  </div>
+</div>
+
 <div class="caption">
   shipping AI-native systems, automation,<br/>
   and intelligence that make teams<br/>
@@ -486,29 +509,47 @@ tick();
 // ── Trigger reveal once everything is ready ──────────
 requestAnimationFrame(() => document.body.classList.add('ready'));
 
-// ── Scene transition: hero exits forward+down, project enters from depth ──
+// ── Scene transitions: hero → project1 → project2 ──
 (() => {
-  const scene = document.getElementById('sceneProjects');
+  const scene1 = document.getElementById('sceneProjects');
+  const scene2 = document.getElementById('sceneProjects2');
   const sceneHero = document.getElementById('sceneHero');
   const sceneProject = document.getElementById('sceneProject');
+  const sceneProject2 = document.getElementById('sceneProject2');
   const projExtras = document.getElementById('projExtras');
+  const projExtras2 = document.getElementById('projExtras2');
   const heroCaption = document.querySelector('.caption');
   const heroMark = document.querySelector('.mark');
-  if (!scene || !sceneHero || !sceneProject) return;
+  if (!scene1 || !sceneHero || !sceneProject) return;
 
-  // Expose progress globally so the WebGL tick can read it
+  const easeOut = x => 1 - Math.pow(1 - x, 3);
+  const clamp01 = x => Math.max(0, Math.min(1, x));
+  function progressOf(el){
+    const r = el.getBoundingClientRect();
+    const total = r.height - innerHeight;
+    const scrolled = Math.min(Math.max(-r.top, 0), total);
+    return total > 0 ? scrolled / total : 0;
+  }
+  function setProject(el, opacity, scale, yVh){
+    el.style.opacity = String(opacity);
+    el.style.transform = `translate(0, calc(-50% + ${yVh}vh)) scale(${scale})`;
+  }
+  function setExtras(el, opacity){
+    el.style.opacity = String(opacity);
+    el.style.transform = `translateY(${(1 - opacity) * 14}px)`;
+  }
+
+  // Expose section 1 progress globally so the WebGL tick can read it
   window.__sceneProgress = 0;
 
   function loop() {
-    const r = scene.getBoundingClientRect();
-    const total = r.height - innerHeight;
-    const scrolled = Math.min(Math.max(-r.top, 0), total);
-    const p = total > 0 ? scrolled / total : 0;
-    window.__sceneProgress = p;
+    const p1 = progressOf(scene1);
+    const p2 = scene2 ? progressOf(scene2) : 0;
+    window.__sceneProgress = p1;
 
-    // Hero exits forward + DOWN (clamped) — done by p=0.40
-    const hp = Math.max(0, Math.min(1, p / 0.40));
-    const easedH = 1 - Math.pow(1 - hp, 3);
+    // ── Hero (h1) exits during section 1 ─────────────────
+    const hp = clamp01(p1 / 0.40);
+    const easedH = easeOut(hp);
     const heroScale = 1 + easedH * 1.6;
     const heroY = easedH * 90;
     const heroBlur = easedH * 10;
@@ -518,25 +559,55 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
     sceneHero.style.filter = `blur(${heroBlur}px)`;
 
     // Hero caption + mark fade out fast
-    const heroFade = String(Math.max(0, 1 - p / 0.20));
+    const heroFade = String(Math.max(0, 1 - p1 / 0.20));
     if (heroCaption) heroCaption.style.opacity = heroFade;
     if (heroMark) heroMark.style.opacity = heroFade;
 
-    // Project title fully settled by p=0.45 — long rest state from 0.45 → 1.0
-    const pp = Math.max(0, Math.min(1, (p - 0.20) / 0.25));
-    const easedP = 1 - Math.pow(1 - pp, 3);
-    const projScale = 0.65 + easedP * 0.35;
-    sceneProject.style.transform =
-      `translate(0, -50%) scale(${projScale})`;
-    sceneProject.style.opacity = String(easedP);
-    sceneProject.style.filter = 'none';
+    // ── Project 1 ─────────────────────────────────────────
+    // Enters during section 1 (p1: 0.20 → 0.45)
+    // Exits during section 2  (p2: 0    → 0.40)
+    let p1Op, p1Scale, p1Y;
+    if (p2 > 0) {
+      // Section 2 active → project 1 is exiting (rushes forward + drops)
+      const exitT = clamp01(p2 / 0.40);
+      const easedExit = easeOut(exitT);
+      p1Op = 1 - easedExit;
+      p1Scale = 1 + easedExit * 1.6;
+      p1Y = easedExit * 90;
+    } else {
+      const enterT = clamp01((p1 - 0.20) / 0.25);
+      const easedEnter = easeOut(enterT);
+      p1Op = easedEnter;
+      p1Scale = 0.65 + easedEnter * 0.35;
+      p1Y = 0;
+    }
+    setProject(sceneProject, p1Op, p1Scale, p1Y);
 
-    // Project extras (tag, CTA, info) settled by p=0.50
+    // Project 1 extras (mirrors project 1's lifecycle)
     if (projExtras) {
-      const ep = Math.max(0, Math.min(1, (p - 0.30) / 0.20));
-      const easedE = 1 - Math.pow(1 - ep, 3);
-      projExtras.style.opacity = String(easedE);
-      projExtras.style.transform = `translateY(${(1 - easedE) * 14}px)`;
+      let exOp;
+      if (p2 > 0) {
+        const exitT = clamp01(p2 / 0.30);
+        exOp = 1 - easeOut(exitT);
+      } else {
+        const enterT = clamp01((p1 - 0.30) / 0.20);
+        exOp = easeOut(enterT);
+      }
+      setExtras(projExtras, exOp);
+    }
+
+    // ── Project 2 ─────────────────────────────────────────
+    // Enters during section 2 (p2: 0.20 → 0.45), then rest state to p2=1
+    if (sceneProject2) {
+      const enterT = clamp01((p2 - 0.20) / 0.25);
+      const eased = easeOut(enterT);
+      const op = eased;
+      const scale = 0.65 + eased * 0.35;
+      setProject(sceneProject2, op, scale, 0);
+    }
+    if (projExtras2) {
+      const exT = clamp01((p2 - 0.30) / 0.20);
+      setExtras(projExtras2, easeOut(exT));
     }
 
     requestAnimationFrame(loop);
