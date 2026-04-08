@@ -142,6 +142,7 @@
     position:sticky;top:0;
     height:100vh;width:100%;
     overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
   }
   .scene-hero{
     position:absolute;left:44px;right:44px;top:50%;
@@ -172,15 +173,15 @@
   .ready .scene-hero .line:nth-child(2) .word > span{transition-delay:.18s}
   .ready .scene-hero .line:nth-child(3) .word > span{transition-delay:.30s}
   .scene-project{
-    position:absolute;inset:0;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    /* Normal flex child of .scene-sticky → reliably centered */
     text-align:center;
-    will-change:transform,opacity,filter;
+    will-change:transform,opacity;
     pointer-events:none;
     opacity:0;
     transform-origin:center center;
     padding:0 44px;
     z-index:8;
+    max-width:1400px;
   }
   .scene-project .proj-label{
     font-family:"Victor Mono",ui-monospace,monospace;
@@ -408,27 +409,7 @@ clusterB.position.set(0.7, -0.85, 0.3);
 clusterB.scale.set(1.0, 1.0, 1.0);
 scene.add(clusterB);
 
-// ── Project-state object: matches the hero cluster material exactly ─
-const knotMat = new THREE.MeshPhysicalMaterial({
-  color: 0xeaecf2,
-  metalness: 0.15,
-  roughness: 0.32,
-  transmission: 0.55,
-  thickness: 0.6,
-  ior: 1.35,
-  transparent: true,
-  opacity: 0,
-  clearcoat: 0.6,
-  clearcoatRoughness: 0.25,
-  envMapIntensity: 0.7,
-});
-const knot = new THREE.Mesh(
-  new THREE.TorusKnotGeometry(0.85, 0.26, 240, 48, 2, 3),
-  knotMat
-);
-knot.position.set(0, 0, 0);
-knot.scale.set(0.6, 0.6, 0.6);
-scene.add(knot);
+// (Knot removed — project state is text-only for now)
 
 // Helper to set group opacity (recursively on all child mesh materials)
 function setGroupOpacity(group, value){
@@ -477,7 +458,6 @@ function tick(){
 
   setGroupOpacity(clusterA, heroVis * 0.9);
   setGroupOpacity(clusterB, heroVis * 0.9);
-  knotMat.opacity = projVis;
 
   // Cluster rotation + drop-down motion as hero exits
   clusterA.rotation.y = t * 0.35;
@@ -492,14 +472,6 @@ function tick(){
   clusterA.position.y = 1.0 - my * 0.15 - p * 1.5;   // also drop with scroll
   clusterB.position.x = 0.7 + mx * 0.25;
   clusterB.position.y = -0.7 - my * 0.18 - p * 1.8;
-
-  // Knot rises from depth + slowly rotates
-  knot.position.y = (1 - projVis) * -1.5;            // starts below, rises to 0
-  knot.position.z = -2 + projVis * 2;                // starts far, comes forward
-  const knotScale = 0.4 + projVis * 0.6;
-  knot.scale.set(knotScale, knotScale, knotScale);
-  knot.rotation.x = t * 0.25;
-  knot.rotation.y = t * 0.35;
 
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
