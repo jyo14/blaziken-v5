@@ -143,7 +143,84 @@
   #sceneProjects4{ height:280vh; }
   #sceneAbout,
   #sceneTeam{ height:280vh; }
+  #sceneServices{ height:300vh; }
   #sceneContact{ height:320vh; }
+
+  /* Services layer — list of 6 with hover-revealed image */
+  .services-layer{
+    position:fixed;
+    top:50%;left:0;right:0;
+    padding:0 44px;
+    z-index:9;
+    pointer-events:none;
+    opacity:0;
+    transform:translate(0, calc(-50% + 110vh));
+    will-change:transform,opacity;
+  }
+  .services-layer .inner{max-width:1400px;margin:0 auto}
+  .services-layer h2{
+    font-family:"Victor Mono",ui-monospace,monospace;
+    font-weight:500;
+    font-size:clamp(34px,5.4vw,92px);
+    line-height:.98;
+    letter-spacing:-.025em;
+    color:#0a0a0a;
+    margin:0 0 50px;
+    max-width:22ch;
+  }
+  .services-list{
+    list-style:none;margin:0;padding:0;
+    pointer-events:auto;
+  }
+  .services-list li{
+    border-top:1px solid rgba(10,20,40,.16);
+    padding:22px 4px;
+    display:flex;align-items:baseline;gap:14px;
+    font-family:"Victor Mono",ui-monospace,monospace;
+    cursor:pointer;
+    transition:opacity .35s, padding-left .4s cubic-bezier(.2,.8,.2,1);
+  }
+  .services-list li:last-child{border-bottom:1px solid rgba(10,20,40,.16)}
+  .services-list li .name{
+    font-size:clamp(18px,2.2vw,34px);
+    font-weight:500;
+    color:#0a0a0a;
+    letter-spacing:-.01em;
+  }
+  .services-list li .num{
+    font-size:11px;color:#1f2530;letter-spacing:.08em;
+  }
+  .services-list li .arrow{
+    margin-left:auto;
+    font-size:16px;color:#1f2530;
+    transition:transform .4s cubic-bezier(.2,.8,.2,1), color .4s;
+  }
+  .services-list:hover li{opacity:.35}
+  .services-list li:hover{opacity:1;padding-left:20px}
+  .services-list li:hover .arrow{transform:translateX(10px);color:#0a0a0a}
+
+  .services-image{
+    position:fixed;top:0;left:0;
+    width:280px;height:180px;
+    border-radius:8px;
+    background-size:cover;background-position:center;
+    pointer-events:none;
+    opacity:0;
+    z-index:14;
+    transform:translate(-50%,-50%) scale(.9) rotate(-2deg);
+    transition:opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1);
+    box-shadow:0 40px 80px rgba(10,20,40,.22), 0 8px 20px rgba(10,20,40,.10);
+    border:1px solid rgba(255,255,255,.5);
+  }
+  .services-image.show{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1) rotate(0deg);
+  }
+
+  @media (max-width:780px){
+    .services-layer h2{font-size:32px}
+    .services-image{width:180px;height:120px}
+  }
 
   /* Contact layer — big left headline + right form, rises from bottom */
   .contact-layer{
@@ -726,6 +803,49 @@
   <div class="desc">Technical product managers translating ambition into roadmaps that ship.</div>
 </div>
 
+<!-- Services scroll runway + layer -->
+<section class="scene-projects" id="sceneServices"></section>
+
+<div class="services-layer" id="servicesLayer">
+  <div class="inner">
+    <h2>SERVICES BUILT FOR<br/>TEAMS THAT SHIP.</h2>
+    <ul class="services-list" id="servicesList">
+      <li data-img="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop">
+        <span class="name">AI Systems</span>
+        <span class="num">/ 01</span>
+        <span class="arrow">→</span>
+      </li>
+      <li data-img="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop">
+        <span class="name">Automation</span>
+        <span class="num">/ 02</span>
+        <span class="arrow">→</span>
+      </li>
+      <li data-img="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop">
+        <span class="name">Web Platforms</span>
+        <span class="num">/ 03</span>
+        <span class="arrow">→</span>
+      </li>
+      <li data-img="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=400&fit=crop">
+        <span class="name">Mobile Apps</span>
+        <span class="num">/ 04</span>
+        <span class="arrow">→</span>
+      </li>
+      <li data-img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop">
+        <span class="name">Data Intelligence</span>
+        <span class="num">/ 05</span>
+        <span class="arrow">→</span>
+      </li>
+      <li data-img="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=400&fit=crop">
+        <span class="name">Cloud &amp; DevOps</span>
+        <span class="num">/ 06</span>
+        <span class="arrow">→</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="services-image" id="servicesImage"></div>
+
 <!-- Contact scroll runway + layer -->
 <section class="scene-projects" id="sceneContact"></section>
 
@@ -918,6 +1038,37 @@ tick();
 // ── Trigger reveal once everything is ready ──────────
 requestAnimationFrame(() => document.body.classList.add('ready'));
 
+// ── Services hover-image (cursor-followed reveal) ────
+(() => {
+  const list = document.getElementById('servicesList');
+  const img = document.getElementById('servicesImage');
+  if (!list || !img) return;
+
+  let x = innerWidth / 2, y = innerHeight / 2;
+  let tx = x, ty = y;
+  window.addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; });
+
+  function tick(){
+    x += (tx - x) * 0.18;
+    y += (ty - y) * 0.18;
+    img.style.left = x + 'px';
+    img.style.top  = y + 'px';
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  list.querySelectorAll('li').forEach(li => {
+    li.addEventListener('mouseenter', () => {
+      const src = li.dataset.img;
+      if (src) img.style.backgroundImage = `url("${src}")`;
+      img.classList.add('show');
+    });
+    li.addEventListener('mouseleave', () => {
+      img.classList.remove('show');
+    });
+  });
+})();
+
 // ── Scene transitions: hero → project 1 → 2 → 3 → 4 ──
 (() => {
   const scenes = [
@@ -927,10 +1078,12 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
     document.getElementById('sceneProjects4'),
     document.getElementById('sceneAbout'),
     document.getElementById('sceneTeam'),
+    document.getElementById('sceneServices'),
     document.getElementById('sceneContact'),
   ];
   const aboutLayer = document.getElementById('aboutLayer');
   const teamLayer = document.getElementById('teamLayer');
+  const servicesLayer = document.getElementById('servicesLayer');
   const contactLayer = document.getElementById('contactLayer');
   const teamCards = [
     { el: document.getElementById('teamCard1'), start: 0.18 },
@@ -1053,13 +1206,13 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
       aboutLayer.style.opacity = String(op);
     }
 
-    // ── Team layer: rises from bottom in scene 5, exits up in scene 6 ──
+    // ── Team layer: rises in scene 5, exits up when scene 6 (Services) starts ──
     if (teamLayer && scenes[5]) {
       const pt = ps[5];
-      const pc = ps[6] || 0;
+      const psv = ps[6] || 0;
       let op, y;
-      if (pc > 0) {
-        const t = clamp01(pc / 0.40);
+      if (psv > 0) {
+        const t = clamp01(psv / 0.40);
         const e = easeOut(t);
         op = 1 - e;
         y = -e * 110;
@@ -1073,9 +1226,29 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
       teamLayer.style.opacity = String(op);
     }
 
-    // ── Contact layer: rises from bottom in scene 6 ──
-    if (contactLayer && scenes[6]) {
-      const pc = ps[6];
+    // ── Services layer: rises in scene 6, exits up in scene 7 ──
+    if (servicesLayer && scenes[6]) {
+      const psv = ps[6];
+      const pc  = ps[7] || 0;
+      let op, y;
+      if (pc > 0) {
+        const t = clamp01(pc / 0.40);
+        const e = easeOut(t);
+        op = 1 - e;
+        y = -e * 110;
+      } else {
+        const t = clamp01((psv - 0.10) / 0.40);
+        const e = easeOut(t);
+        op = e;
+        y = (1 - e) * 110;
+      }
+      servicesLayer.style.transform = `translate(0, calc(-50% + ${y}vh))`;
+      servicesLayer.style.opacity = String(op);
+    }
+
+    // ── Contact layer: rises from bottom in scene 7 ──
+    if (contactLayer && scenes[7]) {
+      const pc = ps[7];
       const t = clamp01((pc - 0.10) / 0.40);
       const e = easeOut(t);
       const y = (1 - e) * 110;
