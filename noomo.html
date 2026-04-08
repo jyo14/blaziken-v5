@@ -304,8 +304,8 @@
     </h1>
     <div class="scene-project" id="sceneProject">
       <div class="proj-label">01 — SELECTED WORK</div>
-      <h2 class="proj-title">SURVEY INSIGHTS</h2>
-      <div class="proj-meta">2025 · NLP / RAG / AGENTS · 91% ACCURACY</div>
+      <h2 class="proj-title">SURVEY INSIGHTS ENGINE</h2>
+      <div class="proj-meta">2025 · 91% ACCURACY · 2,847 RESPONSES / Q3</div>
     </div>
 
     <div class="proj-extras" id="projExtras">
@@ -316,7 +316,7 @@
       <button class="cta" type="button">View project →</button>
       <div class="right">
         <strong>Blaziken Labs</strong>
-        Production NLP pipeline classifying open-ended survey responses at scale, surfacing themes analysts took weeks to find.
+        NLP pipeline classifying open-ended survey responses at scale, surfacing themes analysts took weeks to find.
       </div>
     </div>
   </div>
@@ -405,19 +405,22 @@ clusterB.position.set(0.7, -0.85, 0.3);
 clusterB.scale.set(1.0, 1.0, 1.0);
 scene.add(clusterB);
 
-// ── Project-state object: chrome torus knot (different sculpture) ─
+// ── Project-state object: matches the hero cluster material exactly ─
 const knotMat = new THREE.MeshPhysicalMaterial({
-  color: 0xeef0f5,
-  metalness: 0.95,
-  roughness: 0.12,
-  clearcoat: 0.8,
-  clearcoatRoughness: 0.15,
-  envMapIntensity: 1.3,
+  color: 0xeaecf2,
+  metalness: 0.15,
+  roughness: 0.32,
+  transmission: 0.55,
+  thickness: 0.6,
+  ior: 1.35,
   transparent: true,
   opacity: 0,
+  clearcoat: 0.6,
+  clearcoatRoughness: 0.25,
+  envMapIntensity: 0.7,
 });
 const knot = new THREE.Mesh(
-  new THREE.TorusKnotGeometry(0.95, 0.28, 240, 32, 2, 3),
+  new THREE.TorusKnotGeometry(0.85, 0.26, 240, 48, 2, 3),
   knotMat
 );
 knot.position.set(0, 0, 0);
