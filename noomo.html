@@ -141,6 +141,39 @@
   #sceneProjects2,
   #sceneProjects3,
   #sceneProjects4{ height:280vh; }
+  #sceneAbout{ height:280vh; }
+
+  /* About paragraph — rises from bottom, settles on the left */
+  .about-layer{
+    position:fixed;
+    left:44px;
+    top:50%;
+    max-width:min(900px, 64vw);
+    font-family:"Victor Mono",ui-monospace,monospace;
+    font-weight:500;
+    font-size:clamp(20px,2.4vw,40px);
+    line-height:1.25;
+    letter-spacing:-.015em;
+    color:#0a0a0a;
+    z-index:9;
+    opacity:0;
+    transform:translate(0, calc(-50% + 110vh));
+    will-change:transform,opacity;
+    pointer-events:none;
+  }
+  .about-layer .lab{
+    display:inline-flex;align-items:center;gap:12px;
+    font-family:"Victor Mono",ui-monospace,monospace;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:#1f2530;font-weight:500;
+    margin-bottom:28px;
+  }
+  .about-layer .lab::before{
+    content:"";width:28px;height:1px;background:#1f2530;
+  }
+  .about-layer p em{
+    font-style:normal;color:#1f2530;
+  }
   .scene-sticky{
     position:sticky;top:0;
     height:100vh;width:100%;
@@ -398,6 +431,14 @@
   </div>
 </div>
 
+<!-- About scroll runway + paragraph -->
+<section class="scene-projects" id="sceneAbout"></section>
+
+<div class="about-layer" id="aboutLayer">
+  <div class="lab">05 — Studio</div>
+  <p>Established in 2024, <em>Blaziken Technologies</em> is an AI-native software studio that builds intelligent systems for businesses ready to evolve. We approach every project through the lens of artificial intelligence — not as an afterthought, but as a foundation. With 15 minds working across engineering, design, and product, we turn complex problems into elegant, scalable software.</p>
+</div>
+
 <div class="caption">
   shipping AI-native systems, automation,<br/>
   and intelligence that make teams<br/>
@@ -560,7 +601,9 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
     document.getElementById('sceneProjects2'),
     document.getElementById('sceneProjects3'),
     document.getElementById('sceneProjects4'),
+    document.getElementById('sceneAbout'),
   ];
+  const aboutLayer = document.getElementById('aboutLayer');
   const projects = [
     document.getElementById('sceneProject'),
     document.getElementById('sceneProject2'),
@@ -656,6 +699,16 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
         setExtras(ex, exOp);
       }
     });
+
+    // ── About paragraph: rises from bottom, settles on the left ──
+    if (aboutLayer && scenes[4]) {
+      const pa = ps[4];
+      const t = clamp01((pa - 0.10) / 0.40);
+      const e = easeOut(t);
+      const yOffset = (1 - e) * 110; // 110vh below center → 0
+      aboutLayer.style.transform = `translate(0, calc(-50% + ${yOffset}vh))`;
+      aboutLayer.style.opacity = String(e);
+    }
 
     requestAnimationFrame(loop);
   }
