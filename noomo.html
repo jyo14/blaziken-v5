@@ -180,6 +180,7 @@
     opacity:0;
     transform-origin:center center;
     padding:0 44px;
+    z-index:8;
   }
   .scene-project .proj-label{
     font-family:"Victor Mono",ui-monospace,monospace;
@@ -532,9 +533,9 @@ function tick(){
   const p = window.__sceneProgress || 0;
 
   // Hero state: clusters visible. Project state: knot visible.
-  // Crossfade around p ≈ 0.5
-  const heroVis = Math.max(0, 1 - p / 0.55);
-  const projVis = Math.max(0, Math.min(1, (p - 0.45) / 0.45));
+  // Faster crossfade so the two never share the canvas
+  const heroVis = Math.max(0, 1 - p / 0.30);
+  const projVis = Math.max(0, Math.min(1, (p - 0.30) / 0.35));
 
   setGroupOpacity(clusterA, heroVis * 0.9);
   setGroupOpacity(clusterB, heroVis * 0.9);
@@ -601,23 +602,22 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
     sceneHero.style.opacity = String(1 - easedH * 1.05);
     sceneHero.style.filter = `blur(${heroBlur}px)`;
 
-    // Hero caption + mark fade out as we leave the hero state
-    const heroFade = String(Math.max(0, 1 - p / 0.35));
+    // Hero caption + mark fade out fast
+    const heroFade = String(Math.max(0, 1 - p / 0.25));
     if (heroCaption) heroCaption.style.opacity = heroFade;
     if (heroMark) heroMark.style.opacity = heroFade;
 
-    // Project title enters from depth — earlier so it's clearly visible mid-scroll
-    const pp = Math.max(0, (p - 0.25) / 0.55);
+    // Project title enters early and large so it's unmistakable
+    const pp = Math.max(0, Math.min(1, (p - 0.20) / 0.40));
     const easedP = 1 - Math.pow(1 - pp, 3);
-    const projScale = 0.35 + easedP * 0.65;
-    const projBlur = (1 - easedP) * 10;
+    const projScale = 0.65 + easedP * 0.35;
     sceneProject.style.transform = `scale(${projScale})`;
     sceneProject.style.opacity = String(easedP);
-    sceneProject.style.filter = `blur(${projBlur}px)`;
+    sceneProject.style.filter = 'none';
 
-    // Project extras (tag, CTA, info) — fade in once title is mostly in
+    // Project extras (tag, CTA, info card) — start fading in earlier too
     if (projExtras) {
-      const ep = Math.max(0, Math.min(1, (p - 0.55) / 0.30));
+      const ep = Math.max(0, Math.min(1, (p - 0.40) / 0.30));
       const easedE = 1 - Math.pow(1 - ep, 3);
       projExtras.style.opacity = String(easedE);
       projExtras.style.transform = `translateY(${(1 - easedE) * 14}px)`;
