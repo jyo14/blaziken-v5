@@ -185,8 +185,8 @@
   }
   .scene-project .proj-label{
     font-family:"Victor Mono",ui-monospace,monospace;
-    font-size:12px;letter-spacing:.2em;text-transform:uppercase;
-    color:#1f2530;margin-bottom:28px;
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:#1f2530;margin-bottom:20px;
     display:inline-flex;align-items:center;gap:12px;
   }
   .scene-project .proj-label::before{
@@ -195,21 +195,25 @@
   .scene-project .proj-title{
     font-family:"Victor Mono",ui-monospace,monospace;
     font-weight:500;
-    font-size:clamp(48px,11vw,196px);
-    letter-spacing:-.03em;line-height:.94;
+    font-size:clamp(40px,6.6vw,108px);
+    letter-spacing:-.025em;line-height:.96;
     color:#0a0a0a;
     margin:0;
+    max-width:14ch;
+    margin-left:auto;margin-right:auto;
   }
   .scene-project .proj-meta{
-    margin-top:28px;
+    margin-top:22px;
     font-family:"Victor Mono",ui-monospace,monospace;
-    font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
     color:#1f2530;
   }
 
   /* Bottom-left tag, center CTA, bottom-right info — appear with project */
   .proj-extras{
-    position:absolute;inset:0;
+    position:absolute;
+    top:0;left:0;
+    width:100%;height:100%;
     pointer-events:none;
     opacity:0;
     will-change:opacity,transform;
