@@ -319,6 +319,67 @@
     .contact-layer .form{margin-top:0}
   }
 
+  /* ── Footer ─────────────────────────────────────────── */
+  .footer{
+    position:relative;z-index:7;
+    padding:120px 44px 40px;
+    font-family:"Victor Mono",ui-monospace,monospace;
+    color:#0a0a0a;
+  }
+  .footer-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    gap:48px;
+    max-width:1500px;margin:0 auto 90px;
+  }
+  .footer-grid .col{display:flex;flex-direction:column;gap:14px}
+  .footer-grid .col-title{
+    font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+    color:#5a6373;font-weight:500;
+    margin-bottom:8px;
+  }
+  .footer-grid a{
+    font-size:14px;color:#0a0a0a;text-decoration:none;
+    width:fit-content;
+    transition:opacity .25s, transform .25s;
+  }
+  .footer-grid a:hover{opacity:.55;transform:translateX(3px)}
+  .footer-grid .loc{
+    font-size:12px;color:#1f2530;line-height:1.7;
+  }
+  .footer-grid .loc strong{
+    display:block;color:#0a0a0a;font-weight:600;margin-bottom:4px;
+  }
+
+  .footer-bottom{
+    max-width:1500px;margin:0 auto;
+    padding-top:36px;
+    border-top:1px solid rgba(10,20,40,.15);
+    display:flex;justify-content:space-between;align-items:flex-end;
+    gap:24px;
+  }
+  .footer-brand{
+    display:flex;align-items:center;gap:18px;
+    color:#0a0a0a;text-decoration:none;
+    font-family:"Victor Mono",ui-monospace,monospace;
+    font-size:clamp(36px,5vw,72px);font-weight:700;letter-spacing:.04em;
+    line-height:1;
+  }
+  .footer-brand svg{
+    width:1em;height:1em;
+    color:#0a0a0a;
+  }
+  .footer-meta{
+    font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    color:#5a6373;text-align:right;line-height:1.7;
+  }
+
+  @media (max-width:780px){
+    .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+    .footer-bottom{flex-direction:column;align-items:flex-start;gap:20px}
+    .footer-brand{font-size:48px}
+    .footer-meta{text-align:left}
+  }
+
   /* About paragraph — rises from bottom, settles on the left */
   .about-layer{
     position:fixed;
@@ -883,6 +944,52 @@
   </form>
 </div>
 
+<!-- Footer ─────────────────────────────────────────── -->
+<footer class="footer" id="footer">
+  <div class="footer-grid">
+    <div class="col">
+      <div class="col-title">Navigate</div>
+      <a href="#sceneProjects" data-scroll="sceneProjects" data-offset="0.65">Work</a>
+      <a href="#sceneServices" data-scroll="sceneServices" data-offset="0.55">Services</a>
+      <a href="#sceneTeam"     data-scroll="sceneTeam"     data-offset="0.55">Team</a>
+      <a href="#sceneContact"  data-scroll="sceneContact"  data-offset="0.55">Connect</a>
+      <a href="#">Privacy</a>
+    </div>
+    <div class="col">
+      <div class="col-title">Social</div>
+      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="#" target="_blank" rel="noopener">Twitter / X</a>
+      <a href="#" target="_blank" rel="noopener">GitHub</a>
+      <a href="#" target="_blank" rel="noopener">Dribbble</a>
+    </div>
+    <div class="col">
+      <div class="col-title">Reach us</div>
+      <a href="mailto:dev@blaziken.in">dev@blaziken.in</a>
+      <a href="tel:+917000065346">+91 70000 65346</a>
+    </div>
+    <div class="col">
+      <div class="col-title">Studio</div>
+      <div class="loc">
+        <strong>Available for new projects</strong>
+        Based in Mumbai, India.<br/>
+        Working with teams worldwide.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <a href="#" class="footer-brand">
+      <svg viewBox="0 0 45 45" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M5.1535 40.696C4.20556 40.696 3.43566 39.7319 3.43566 38.5449V6.45305C3.43566 5.26607 4.20556 4.30203 5.1535 4.30203C6.10144 4.30203 6.87132 3.33801 6.87132 2.15102C6.87132 0.964036 6.10144 0 5.1535 0C4.20556 0 3.43566 0.964036 3.43566 2.15102C3.43566 3.33801 2.66578 4.30203 1.71783 4.30203C0.769891 4.30203 0 5.26607 0 6.45305V38.547C0 39.734 0.769891 40.6981 1.71783 40.6981C2.66578 40.6981 3.43566 41.6619 3.43566 42.8489C3.43566 44.0359 4.20556 45 5.1535 45C6.10144 45 6.87132 44.0359 6.87132 42.8489C6.87132 41.6619 6.10144 40.6981 5.1535 40.6981V40.696Z"/><path d="M39.8465 4.30203C40.7945 4.30203 41.5642 5.26607 41.5642 6.45305V38.547C41.5642 39.734 40.7945 40.6981 39.8465 40.6981C38.8985 40.6981 38.1286 41.6619 38.1286 42.8489C38.1286 44.0359 38.8985 45 39.8465 45C40.7945 45 41.5642 44.0359 41.5642 42.8489C41.5642 41.6619 42.3341 40.6981 43.2821 40.6981C44.2301 40.6981 45 39.734 45 38.547V6.45305C45 5.26607 44.2301 4.30203 43.2821 4.30203C42.3341 4.30203 41.5642 3.33801 41.5642 2.15102C41.5642 0.964036 40.7945 0 39.8465 0C38.8985 0 38.1286 0.964036 38.1286 2.15102C38.1286 3.33801 38.8985 4.30203 39.8465 4.30203Z"/><path d="M13.5448 36.6394V8.3584H25.4115C29.457 8.3584 32.1195 10.8913 32.1195 15.3647C32.1195 18.616 30.6705 21.0643 27.5677 21.6546V21.9086C31.0397 22.6249 32.8267 25.2011 32.8267 28.8303C32.8267 33.7267 30.062 36.6394 25.7476 36.6394H13.5448ZM15.9386 20.6824H25.0074C28.0754 20.6824 29.7273 19.163 29.7273 15.9117C29.7273 12.6604 28.2783 11.0998 25.2102 11.0998H15.9386V20.6824ZM15.9386 33.896H25.5466C28.7497 33.896 30.4016 32.2508 30.4016 28.5349C30.4016 24.8192 28.6822 23.2586 25.5466 23.2586H15.9386V33.896Z"/></svg>
+      <span>BLAZIKEN</span>
+    </a>
+    <div class="footer-meta">
+      © 2026 Blaziken Technologies<br/>
+      AI-Native · Founded in India<br/>
+      v5.0 · Build 2026.04
+    </div>
+  </div>
+</footer>
+
 <div class="caption">
   shipping AI-native systems, automation,<br/>
   and intelligence that make teams<br/>
@@ -1039,7 +1146,7 @@ tick();
 requestAnimationFrame(() => document.body.classList.add('ready'));
 
 // ── Nav anchor scrolling — lands in each section's settled state ──
-document.querySelectorAll('nav .links a[data-scroll]').forEach(link => {
+document.querySelectorAll('a[data-scroll]').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
     const target = document.getElementById(link.dataset.scroll);
@@ -1258,14 +1365,26 @@ document.querySelectorAll('nav .links a[data-scroll]').forEach(link => {
       servicesLayer.style.opacity = String(op);
     }
 
-    // ── Contact layer: rises from bottom in scene 7 ──
+    // ── Contact layer: rises in scene 7, fades out as footer enters view ──
     if (contactLayer && scenes[7]) {
       const pc = ps[7];
-      const t = clamp01((pc - 0.10) / 0.40);
-      const e = easeOut(t);
-      const y = (1 - e) * 110;
+      const tIn = clamp01((pc - 0.10) / 0.40);
+      const eIn = easeOut(tIn);
+      let op = eIn;
+      let y = (1 - eIn) * 110;
+
+      const footerEl = document.getElementById('footer');
+      if (footerEl) {
+        const fr = footerEl.getBoundingClientRect();
+        if (fr.top < innerHeight) {
+          // Linear fade as footer slides up into view
+          const exitT = clamp01((innerHeight - fr.top) / (innerHeight * 0.5));
+          op = (1 - exitT) * eIn;
+          y = -exitT * 60;
+        }
+      }
       contactLayer.style.transform = `translate(0, calc(-50% + ${y}vh))`;
-      contactLayer.style.opacity = String(e);
+      contactLayer.style.opacity = String(op);
     }
 
     // ── Team cards: rainbow arc from bottom-right to upper-left, with 3D tilt ──
