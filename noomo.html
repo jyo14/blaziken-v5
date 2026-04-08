@@ -211,27 +211,59 @@
     .team-layer h2{font-size:34px}
   }
 
-  /* Glassmorphic team cards — arc from bottom-right to upper-left */
+  /* Glossy 3D glass cards — arc from bottom-right to upper-left */
   .team-card{
     position:fixed;
     top:50%;left:50%;
-    width:228px;
-    padding:22px 22px 20px;
-    border-radius:10px;
-    background:rgba(255,255,255,.42);
-    backdrop-filter:blur(22px) saturate(140%);
-    -webkit-backdrop-filter:blur(22px) saturate(140%);
-    border:1px solid rgba(255,255,255,.55);
+    width:236px;
+    padding:24px 22px 22px;
+    border-radius:12px;
+    background:
+      linear-gradient(155deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.18) 38%, rgba(255,255,255,.08) 62%, rgba(255,255,255,.42) 100%),
+      rgba(255,255,255,.35);
+    backdrop-filter:blur(24px) saturate(160%);
+    -webkit-backdrop-filter:blur(24px) saturate(160%);
+    border:1px solid rgba(255,255,255,.6);
     box-shadow:
-      0 30px 60px rgba(20,30,50,.14),
-      0 6px 18px rgba(20,30,50,.06),
-      inset 0 1px 0 rgba(255,255,255,.7);
+      0 50px 90px rgba(20,30,50,.20),
+      0 18px 32px rgba(20,30,50,.10),
+      0 4px 10px rgba(20,30,50,.06),
+      inset 0 1px 0 rgba(255,255,255,.85),
+      inset 0 -1px 0 rgba(255,255,255,.18),
+      inset 1px 0 0 rgba(255,255,255,.35),
+      inset -1px 0 0 rgba(255,255,255,.15);
     z-index:11;
     pointer-events:none;
     opacity:0;
     will-change:transform,opacity;
-    transform:translate(-50%,-50%);
+    transform-style:preserve-3d;
   }
+  /* Specular streak across the top — the "glossy" highlight */
+  .team-card::before{
+    content:"";
+    position:absolute;inset:0;
+    border-radius:inherit;
+    background:linear-gradient(110deg,
+      rgba(255,255,255,0)   0%,
+      rgba(255,255,255,.55) 18%,
+      rgba(255,255,255,.10) 32%,
+      rgba(255,255,255,0)   60%);
+    mix-blend-mode:overlay;
+    pointer-events:none;
+  }
+  /* Bottom edge soft fade for thickness illusion */
+  .team-card::after{
+    content:"";
+    position:absolute;inset:0;
+    border-radius:inherit;
+    background:linear-gradient(180deg,
+      rgba(255,255,255,.0) 60%,
+      rgba(10,20,40,.05) 100%);
+    pointer-events:none;
+  }
+  .team-card .num,
+  .team-card .role,
+  .team-card .desc{position:relative;z-index:2}
   .team-card .num{
     font-family:"Victor Mono",ui-monospace,monospace;
     font-size:42px;font-weight:600;color:#0a0a0a;
@@ -839,7 +871,7 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
       teamLayer.style.opacity = String(e);
     }
 
-    // ── Team cards: rainbow arc from bottom-right to upper-left ──
+    // ── Team cards: rainbow arc from bottom-right to upper-left, with 3D tilt ──
     if (scenes[5]) {
       const pt = ps[5];
       teamCards.forEach(c => {
@@ -849,11 +881,16 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
         // at start/end and peaks above center mid-flight (rainbow shape).
         const x = 45 - 100 * t;                    //  45vw  → -55vw
         const y = 100 * t * t - 110 * t + 25;      //  25vh  → -5vh → 15vh
-        const rot = -10 + 20 * t;                  // -10°   → 10°
+        const rot = -10 + 20 * t;                  // -10°   → 10° (in-plane spin)
+        // 3D tilt that follows arc direction — tips toward camera mid-flight
+        const rotY = -14 + 28 * t;                 // -14° → 14° (Y-axis turn)
+        const rotX = 6 - 12 * t;                   //   6° → -6° (X-axis tip)
         // Smooth opacity envelope: 0 → 1 → 0 (sin curve)
         const op = t > 0 && t < 1 ? Math.sin(t * Math.PI) : 0;
         c.el.style.transform =
-          `translate(calc(-50% + ${x}vw), calc(-50% + ${y}vh)) rotate(${rot}deg)`;
+          `perspective(1200px) ` +
+          `translate(calc(-50% + ${x}vw), calc(-50% + ${y}vh)) ` +
+          `rotateY(${rotY}deg) rotateX(${rotX}deg) rotate(${rot}deg)`;
         c.el.style.opacity = String(op);
       });
     }
