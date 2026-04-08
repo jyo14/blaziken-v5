@@ -260,6 +260,113 @@
     .services-head .right{text-align:left}
   }
 
+  /* ── The Lab (vault of design variants) ── */
+  .lab{
+    position:relative;
+    background:var(--bg);
+    padding:140px 40px 120px;
+    border-top:1px solid var(--line);
+  }
+  .lab-inner{max-width:1400px;margin:0 auto}
+  .lab-head{
+    display:grid;grid-template-columns:1fr 1.6fr;gap:60px;
+    align-items:end;margin-bottom:80px;
+  }
+  .lab-head .label{
+    font-family:"Geist Mono",monospace;
+    font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+    color:#888;display:flex;align-items:center;gap:10px;
+  }
+  .lab-head .label::before{content:"";width:24px;height:1px;background:#888}
+  .lab-head h2{
+    font-family:"Geist",sans-serif;
+    font-size:clamp(40px,5.4vw,84px);
+    font-weight:500;letter-spacing:-.035em;line-height:1;
+    margin-top:18px;color:#0a0a0a;
+  }
+  .lab-head h2 em{font-style:italic;font-weight:400;color:var(--accent)}
+  .lab-head .right{
+    font-family:"Geist",sans-serif;
+    font-size:15px;line-height:1.55;color:#6b6b6b;
+    max-width:46ch;
+  }
+  .lab-meta{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:40px;gap:24px;
+    font-family:"Geist Mono",monospace;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:#888;
+  }
+  .lab-meta .today{color:#0a0a0a}
+  .lab-meta .today strong{color:var(--accent);font-weight:500;margin:0 6px}
+
+  .lab-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:1px;background:var(--line);
+    border:1px solid var(--line);
+  }
+  .lab-card{
+    position:relative;
+    background:var(--bg);
+    padding:40px 32px 36px;
+    min-height:280px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    color:#0a0a0a;text-decoration:none;
+    transition:background .35s;
+    overflow:hidden;
+  }
+  .lab-card:hover{background:#ececea}
+  .lab-card.is-today{background:#f7faf7}
+  .lab-card.is-today::after{
+    content:"";position:absolute;left:0;right:0;top:0;height:1px;
+    background:var(--accent);
+  }
+  .lab-card .top{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    font-family:"Geist Mono",monospace;
+    font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    color:#888;
+  }
+  .lab-card .top .day{color:#555}
+  .lab-card .top .badge{
+    display:none;
+    padding:4px 10px;border:1px solid var(--accent);
+    color:var(--accent);border-radius:999px;
+  }
+  .lab-card.is-today .top .badge{display:inline-block}
+  .lab-card .name{
+    font-family:"Geist",sans-serif;
+    font-size:28px;font-weight:500;letter-spacing:-.02em;
+    color:#0a0a0a;
+    margin:28px 0 10px;
+  }
+  .lab-card .name em{font-style:italic;font-weight:400;color:var(--accent)}
+  .lab-card .desc{
+    font-family:"Geist",sans-serif;
+    font-size:13px;line-height:1.55;color:#6b6b6b;
+    max-width:32ch;margin-bottom:24px;
+  }
+  .lab-card .arrow{
+    font-family:"Geist Mono",monospace;
+    font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    color:#888;
+    display:inline-flex;align-items:center;gap:10px;
+    transition:color .25s, transform .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .lab-card:hover .arrow{color:#0a0a0a;transform:translateX(6px)}
+  .lab-card.you{background:#f1f1ef;cursor:default}
+  .lab-card.you:hover{background:#f1f1ef}
+  .lab-card.you .arrow{color:var(--accent)}
+
+  @media (max-width:980px){
+    .lab-head{grid-template-columns:1fr;gap:24px}
+    .lab-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:640px){
+    .lab-grid{grid-template-columns:1fr}
+    .lab{padding:100px 24px 80px}
+  }
+
   /* ── Contact section ── */
   .contact{
     position:relative;
@@ -1350,6 +1457,70 @@
     requestAnimationFrame(update);
   }
   update();
+})();
+</script>
+
+<section class="lab" id="lab">
+  <div class="lab-inner">
+    <div class="lab-head">
+      <div>
+        <div class="label">05 — The Lab</div>
+        <h2>Six ways to be <em>Blaziken</em>.</h2>
+      </div>
+      <p class="right">We tried six different ways to be Blaziken. Here are all of them — six interpretations of the same brand, kept open as a small design diary.</p>
+    </div>
+
+    <div class="lab-meta">
+      <span class="today">Today's pick · <strong id="labTodayName">— —</strong> · <span id="labTodayDay">— —</span></span>
+      <span>Six designs · One every day</span>
+    </div>
+
+    <div class="lab-grid" id="labGrid"></div>
+  </div>
+</section>
+
+<script>
+(() => {
+  const VARIANTS = [
+    { name: 'The Origin',     desc: 'The first cut. Where the brand voice was found.',                                  url: 'https://jyo14.github.io/Blaziken-AI-webpage/',   day: 'Sunday'    },
+    { name: 'The Iteration',  desc: 'Refinements on the original — sharper type, tighter rhythm.',                      url: 'https://jyo14.github.io/Blaziken-AI-webpage-2/', day: 'Monday'    },
+    { name: 'The Foundation', desc: 'Where the system started to crystallise into a real layout.',                      url: 'https://jyo14.github.io/blaziken-v3/',           day: 'Tuesday'   },
+    { name: 'The Studio',     desc: 'Editorial restraint. Big type, quiet motion, intent over noise.',                  url: 'https://jyo14.github.io/blaziken-v4/',           day: 'Wednesday' },
+    { name: 'The Institute',  desc: 'Pastel particles, scientific minimalism, hover-words. (You are here.)',            url: 'https://jyo14.github.io/blaziken-v5/',           day: 'Thursday', self: true },
+    { name: 'The Showcase',   desc: 'Chrome forms, tunnel transitions, full agency theatrics.',                         url: 'https://jyo14.github.io/blaziken-v5/noomo.html', day: 'Friday'    },
+  ];
+
+  const todayIdx = new Date().getDay() % VARIANTS.length;
+  const today = VARIANTS[todayIdx];
+
+  const dayName = document.getElementById('labTodayDay');
+  const todayName = document.getElementById('labTodayName');
+  if (dayName) dayName.textContent = ['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date().getDay()];
+  if (todayName) todayName.textContent = today.name;
+
+  const grid = document.getElementById('labGrid');
+  if (grid) {
+    VARIANTS.forEach((v, i) => {
+      const isToday = i === todayIdx;
+      const isSelf  = v.self;
+      const tag = isSelf ? 'div' : 'a';
+      const card = document.createElement(tag);
+      card.className = 'lab-card' + (isToday ? ' is-today' : '') + (isSelf ? ' you' : '');
+      if (!isSelf) { card.href = v.url; }
+      card.innerHTML = `
+        <div class="top">
+          <span class="day">${String(i+1).padStart(2,'0')} · ${v.day.toUpperCase()}</span>
+          <span class="badge">Today</span>
+        </div>
+        <div>
+          <div class="name">${v.name}</div>
+          <div class="desc">${v.desc}</div>
+        </div>
+        <span class="arrow">${isSelf ? 'You are here' : 'Open →'}</span>
+      `;
+      grid.appendChild(card);
+    });
+  }
 })();
 </script>
 
