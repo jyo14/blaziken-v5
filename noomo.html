@@ -141,7 +141,8 @@
   #sceneProjects2,
   #sceneProjects3,
   #sceneProjects4{ height:280vh; }
-  #sceneAbout{ height:280vh; }
+  #sceneAbout,
+  #sceneTeam{ height:280vh; }
 
   /* About paragraph — rises from bottom, settles on the left */
   .about-layer{
@@ -173,6 +174,41 @@
   }
   .about-layer p em{
     font-style:normal;color:#1f2530;
+  }
+
+  /* Team layer — big headline left, small paragraph right */
+  .team-layer{
+    position:fixed;
+    top:50%;left:0;right:0;
+    padding:0 44px;
+    display:grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap:60px;align-items:start;
+    z-index:9;
+    pointer-events:none;
+    opacity:0;
+    transform:translate(0, calc(-50% + 110vh));
+    will-change:transform,opacity;
+  }
+  .team-layer h2{
+    font-family:"Victor Mono",ui-monospace,monospace;
+    font-weight:500;
+    font-size:clamp(36px,6.4vw,108px);
+    line-height:.96;
+    letter-spacing:-.025em;
+    color:#0a0a0a;
+    margin:0;
+  }
+  .team-layer .body{
+    margin-top:18px;
+    font-family:"Victor Mono",ui-monospace,monospace;
+    font-size:13px;line-height:1.65;
+    color:#1f2530;
+    max-width:32ch;
+  }
+  @media (max-width:780px){
+    .team-layer{grid-template-columns:1fr;gap:24px}
+    .team-layer h2{font-size:34px}
   }
   .scene-sticky{
     position:sticky;top:0;
@@ -438,6 +474,16 @@
   <p>Established in 2024, <em>Blaziken Technologies</em> is an AI-native software studio that builds intelligent systems for businesses ready to evolve. We approach every project through the lens of artificial intelligence — not as an afterthought, but as a foundation. With 15 minds working across engineering, design, and product, we turn complex problems into elegant, scalable software.</p>
 </div>
 
+<!-- Team scroll runway + layer -->
+<section class="scene-projects" id="sceneTeam"></section>
+
+<div class="team-layer" id="teamLayer">
+  <h2>BRILLIANT SYSTEMS<br/>DON'T SHIP<br/>WITHOUT BRILLIANT MINDS.</h2>
+  <div>
+    <p class="body">Fifteen engineers, designers, and product thinkers working as one shared craft. We build alongside our clients, not for them — translating ambition into systems that ship, scale, and adapt with the team that owns them.</p>
+  </div>
+</div>
+
 <div class="caption">
   shipping AI-native systems, automation,<br/>
   and intelligence that make teams<br/>
@@ -601,8 +647,10 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
     document.getElementById('sceneProjects3'),
     document.getElementById('sceneProjects4'),
     document.getElementById('sceneAbout'),
+    document.getElementById('sceneTeam'),
   ];
   const aboutLayer = document.getElementById('aboutLayer');
+  const teamLayer = document.getElementById('teamLayer');
   const projects = [
     document.getElementById('sceneProject'),
     document.getElementById('sceneProject2'),
@@ -699,14 +747,34 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
       }
     });
 
-    // ── About paragraph: rises from bottom, settles on the left ──
+    // ── About paragraph: rises from bottom in scene 4, exits up in scene 5 ──
     if (aboutLayer && scenes[4]) {
       const pa = ps[4];
-      const t = clamp01((pa - 0.10) / 0.40);
+      const pb = ps[5] || 0;
+      let op, y;
+      if (pb > 0) {
+        const t = clamp01(pb / 0.40);
+        const e = easeOut(t);
+        op = 1 - e;
+        y = -e * 110; // rises up and out of view
+      } else {
+        const t = clamp01((pa - 0.10) / 0.40);
+        const e = easeOut(t);
+        op = e;
+        y = (1 - e) * 110; // from below into center
+      }
+      aboutLayer.style.transform = `translate(0, calc(-50% + ${y}vh))`;
+      aboutLayer.style.opacity = String(op);
+    }
+
+    // ── Team layer: rises from bottom in scene 5 ──
+    if (teamLayer && scenes[5]) {
+      const pt = ps[5];
+      const t = clamp01((pt - 0.10) / 0.40);
       const e = easeOut(t);
-      const yOffset = (1 - e) * 110; // 110vh below center → 0
-      aboutLayer.style.transform = `translate(0, calc(-50% + ${yOffset}vh))`;
-      aboutLayer.style.opacity = String(e);
+      const y = (1 - e) * 110;
+      teamLayer.style.transform = `translate(0, calc(-50% + ${y}vh))`;
+      teamLayer.style.opacity = String(e);
     }
 
     requestAnimationFrame(loop);
