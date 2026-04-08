@@ -135,7 +135,7 @@
   /* ── Scene transition: hero exits → project enters ── */
   .scene-projects{
     position:relative;
-    height:260vh;
+    height:320vh;
     z-index:6;
   }
   .scene-sticky{
@@ -225,59 +225,16 @@
     padding:6px 14px;border:1px solid #1f2530;border-radius:999px;
     color:#0a0a0a;
   }
-  /* Structured info card on the right (Challenge / Solution / Result + stats) */
-  .info-card{
-    position:absolute;right:44px;bottom:44px;
-    width:340px;
-    background:rgba(255,255,255,.55);
-    backdrop-filter:blur(14px);
-    border:1px solid rgba(10,10,10,.08);
-    border-radius:6px;
-    padding:22px 22px 18px;
+  .proj-extras .right{
+    position:absolute;right:44px;bottom:42px;
+    max-width:300px;text-align:right;
     font-family:"Victor Mono",ui-monospace,monospace;
-    color:#1f2530;
-    box-shadow:0 30px 60px rgba(10,20,40,.08);
+    font-size:12px;line-height:1.55;color:#1f2530;
   }
-  .info-card header{
-    display:flex;align-items:center;gap:10px;
-    margin-bottom:14px;
-  }
-  .info-card .badge{
-    font-size:10px;letter-spacing:.12em;
-    padding:4px 8px;border:1px solid #1f2530;border-radius:999px;
-    color:#0a0a0a;
-  }
-  .info-card header strong{
-    font-size:14px;color:#0a0a0a;font-weight:600;letter-spacing:-.005em;
-  }
-  .info-card .lead{
-    font-size:11px;line-height:1.55;color:#3a4250;
-    margin-bottom:14px;
-  }
-  .info-card .row{
-    display:grid;grid-template-columns:74px 1fr;gap:10px;
-    padding:8px 0;
-    border-top:1px solid rgba(10,10,10,.08);
-  }
-  .info-card .row .lab{
-    font-size:9px;letter-spacing:.16em;text-transform:uppercase;
-    color:#5cc26b;font-weight:600;
-  }
-  .info-card .row p{
-    font-size:11px;line-height:1.45;color:#3a4250;
-  }
-  .info-card .stats{
-    display:flex;gap:24px;margin-top:14px;
-    border-top:1px solid rgba(10,10,10,.08);padding-top:14px;
-  }
-  .info-card .stats div{display:flex;flex-direction:column}
-  .info-card .stats b{
-    font-family:"Victor Mono",ui-monospace,monospace;
-    font-size:24px;font-weight:600;color:#0a0a0a;letter-spacing:-.02em;
-  }
-  .info-card .stats span{
-    font-size:9px;letter-spacing:.14em;text-transform:uppercase;
-    color:#5a6373;margin-top:2px;
+  .proj-extras .right strong{
+    display:block;color:#0a0a0a;font-weight:600;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    margin-bottom:8px;
   }
   .proj-extras .cta{
     position:absolute;left:50%;bottom:54px;
@@ -360,29 +317,10 @@
       </div>
       <button class="cta" type="button">View project →</button>
 
-      <aside class="info-card">
-        <header>
-          <span class="badge">360°</span>
-          <strong>Survey Insights Engine</strong>
-        </header>
-        <p class="lead">An AI-powered analysis layer that turns thousands of open-ended responses into actionable insights in hours — not weeks.</p>
-        <div class="row">
-          <span class="lab">Challenge</span>
-          <p>Manual qualitative coding was bottlenecking research teams every quarter.</p>
-        </div>
-        <div class="row">
-          <span class="lab">Solution</span>
-          <p>Hybrid LLM + RAG pipeline that classifies, clusters, and themes responses in one pass.</p>
-        </div>
-        <div class="row">
-          <span class="lab">Result</span>
-          <p>Time-to-insight collapsed from weeks to hours, with senior analysts in the loop.</p>
-        </div>
-        <div class="stats">
-          <div><b>91%</b><span>Accuracy</span></div>
-          <div><b>2,847</b><span>Responses / Q3</span></div>
-        </div>
-      </aside>
+      <div class="right">
+        <strong>Blaziken Labs</strong>
+        AI-powered analysis layer that turns thousands of open-ended survey responses into actionable insights in hours, not weeks. Built with a hybrid LLM and RAG pipeline.
+      </div>
     </div>
   </div>
 </section>
@@ -591,33 +529,33 @@ requestAnimationFrame(() => document.body.classList.add('ready'));
     const p = total > 0 ? scrolled / total : 0;
     window.__sceneProgress = p;
 
-    // Hero exits forward + DOWN (tunnel feel): rushes toward camera + drops below
-    const hp = Math.min(p / 0.55, 1);
+    // Hero exits forward + DOWN (clamped) — done by p=0.40
+    const hp = Math.max(0, Math.min(1, p / 0.40));
     const easedH = 1 - Math.pow(1 - hp, 3);
     const heroScale = 1 + easedH * 1.6;
     const heroY = easedH * 90;
     const heroBlur = easedH * 10;
     sceneHero.style.transform =
       `translate(0, calc(-50% + ${heroY}vh)) scale(${heroScale})`;
-    sceneHero.style.opacity = String(1 - easedH * 1.05);
+    sceneHero.style.opacity = String(1 - easedH);
     sceneHero.style.filter = `blur(${heroBlur}px)`;
 
     // Hero caption + mark fade out fast
-    const heroFade = String(Math.max(0, 1 - p / 0.25));
+    const heroFade = String(Math.max(0, 1 - p / 0.20));
     if (heroCaption) heroCaption.style.opacity = heroFade;
     if (heroMark) heroMark.style.opacity = heroFade;
 
-    // Project title enters early and large so it's unmistakable
-    const pp = Math.max(0, Math.min(1, (p - 0.20) / 0.40));
+    // Project title fully settled by p=0.45 — long rest state from 0.45 → 1.0
+    const pp = Math.max(0, Math.min(1, (p - 0.20) / 0.25));
     const easedP = 1 - Math.pow(1 - pp, 3);
     const projScale = 0.65 + easedP * 0.35;
     sceneProject.style.transform = `scale(${projScale})`;
     sceneProject.style.opacity = String(easedP);
     sceneProject.style.filter = 'none';
 
-    // Project extras (tag, CTA, info card) — start fading in earlier too
+    // Project extras (tag, CTA, info) settled by p=0.50
     if (projExtras) {
-      const ep = Math.max(0, Math.min(1, (p - 0.40) / 0.30));
+      const ep = Math.max(0, Math.min(1, (p - 0.30) / 0.20));
       const easedE = 1 - Math.pow(1 - ep, 3);
       projExtras.style.opacity = String(easedE);
       projExtras.style.transform = `translateY(${(1 - easedE) * 14}px)`;
