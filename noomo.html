@@ -133,6 +133,62 @@
     background:#5cc26b;box-shadow:0 0 0 3px rgba(92,194,107,.2);
   }
 
+  /* ── Scene transition: hero exits → project enters ── */
+  .scene-projects{
+    position:relative;
+    height:260vh;
+    z-index:6;
+  }
+  .scene-sticky{
+    position:sticky;top:0;
+    height:100vh;width:100%;
+    overflow:hidden;
+  }
+  .scene-hero{
+    position:absolute;left:44px;right:44px;top:50%;
+    transform:translateY(-50%);
+    transform-origin:center center;
+    will-change:transform,opacity,filter;
+    pointer-events:none;
+  }
+  .scene-hero .line{
+    display:flex;justify-content:flex-start;align-items:baseline;
+    gap:.35em;width:100%;
+  }
+  .scene-project{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;
+    will-change:transform,opacity,filter;
+    pointer-events:none;
+    opacity:0;
+    transform-origin:center center;
+    padding:0 44px;
+  }
+  .scene-project .proj-label{
+    font-family:"Victor Mono",ui-monospace,monospace;
+    font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+    color:#1f2530;margin-bottom:28px;
+    display:inline-flex;align-items:center;gap:12px;
+  }
+  .scene-project .proj-label::before{
+    content:"";width:28px;height:1px;background:#1f2530;
+  }
+  .scene-project .proj-title{
+    font-family:"Victor Mono",ui-monospace,monospace;
+    font-weight:500;
+    font-size:clamp(48px,11vw,196px);
+    letter-spacing:-.03em;line-height:.94;
+    color:#0a0a0a;
+    margin:0;
+  }
+  .scene-project .proj-meta{
+    margin-top:28px;
+    font-family:"Victor Mono",ui-monospace,monospace;
+    font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    color:#1f2530;
+  }
+
   @media (max-width:780px){
     nav{padding:20px 22px}
     nav .links{display:none}
@@ -178,6 +234,21 @@
       <span class="word"><span>SCALE.</span></span>
     </div>
   </h1>
+</section>
+
+<section class="scene-projects" id="sceneProjects">
+  <div class="scene-sticky">
+    <h1 class="headline scene-hero" aria-hidden="true">
+      <div class="line">SOFTWARE THAT THINKS</div>
+      <div class="line">WITH YOUR TEAM.</div>
+      <div class="line">BUILT FOR SCALE.</div>
+    </h1>
+    <div class="scene-project" id="sceneProject">
+      <div class="proj-label">01 — SELECTED WORK</div>
+      <h2 class="proj-title">SURVEY INSIGHTS</h2>
+      <div class="proj-meta">2025 · NLP / RAG / AGENTS · 91% ACCURACY</div>
+    </div>
+  </div>
 </section>
 
 <div class="caption">
@@ -313,6 +384,50 @@ tick();
 
 // ── Trigger reveal once everything is ready ──────────
 requestAnimationFrame(() => document.body.classList.add('ready'));
+
+// ── Scene transition: hero exits forward+down, project enters from depth ──
+(() => {
+  const scene = document.getElementById('sceneProjects');
+  const sceneHero = scene && scene.querySelector('.scene-hero');
+  const sceneProject = document.getElementById('sceneProject');
+  if (!scene || !sceneHero || !sceneProject) return;
+
+  let last = -1;
+  function loop() {
+    const r = scene.getBoundingClientRect();
+    const total = r.height - innerHeight;
+    const scrolled = Math.min(Math.max(-r.top, 0), total);
+    const p = total > 0 ? scrolled / total : 0;
+
+    if (Math.abs(p - last) > 0.001) {
+      last = p;
+
+      // Hero exits: scale up + push down + blur + fade  (0 → 0.55)
+      const hp = Math.min(p / 0.55, 1);
+      const easedH = 1 - Math.pow(1 - hp, 3);
+      const heroScale = 1 + easedH * 0.55;
+      const heroY = easedH * 55; // vh below center
+      const heroBlur = easedH * 6;
+      sceneHero.style.transform =
+        `translateY(calc(-50% + ${heroY}vh)) scale(${heroScale})`;
+      sceneHero.style.opacity = String(1 - easedH);
+      sceneHero.style.filter = `blur(${heroBlur}px)`;
+
+      // Project enters: scale up from small + fade  (0.35 → 1)
+      const pp = Math.max(0, (p - 0.35) / 0.65);
+      const easedP = 1 - Math.pow(1 - pp, 3);
+      const projScale = 0.45 + easedP * 0.55;
+      const projY = (1 - easedP) * 18; // vh
+      const projBlur = (1 - easedP) * 8;
+      sceneProject.style.transform =
+        `translateY(${projY}vh) scale(${projScale})`;
+      sceneProject.style.opacity = String(easedP);
+      sceneProject.style.filter = `blur(${projBlur}px)`;
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
 </script>
 </body>
 </html>
