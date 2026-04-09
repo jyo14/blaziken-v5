@@ -378,26 +378,26 @@
 
   /* Slide-in form panel */
   .ct-form{
-    position:absolute;top:0;right:0;bottom:0;
+    position:fixed;top:0;right:0;bottom:0;
     width:min(560px,90%);
     background:#111;
     border-left:1px solid rgba(255,255,255,.1);
     padding:64px 56px;
     transform:translateX(105%);
     transition:transform .7s cubic-bezier(.7,0,.2,1);
-    z-index:30;
+    z-index:9999;
     display:flex;flex-direction:column;
     overflow-y:auto;
   }
   .contact.form-open .ct-form{transform:translateX(0)}
   .contact.form-open .ct-form-backdrop{opacity:1;pointer-events:auto}
   .ct-form-backdrop{
-    position:absolute;inset:0;
+    position:fixed;inset:0;
     background:rgba(0,0,0,.6);
     backdrop-filter:blur(4px);
     opacity:0;pointer-events:none;
     transition:opacity .5s ease;
-    z-index:20;
+    z-index:9998;
   }
   .ct-form .close{
     align-self:flex-end;
@@ -539,19 +539,61 @@
   .ct-cta svg{position:relative;z-index:1;transition:transform .35s}
   .ct-cta:hover svg{transform:translateX(6px);stroke:#0a0a0a}
 
-  /* Detail grid */
+  @media (max-width:780px){
+    .ct-main{grid-template-columns:1fr;gap:24px}
+  }
 
-  .ct-foot{
-    max-width:1400px;margin:60px auto 0;
+  /* ── Footer ── */
+  .site-footer{
+    background:#050505;color:#f1f1ef;
+    padding:80px 40px 40px;
+    border-top:1px solid rgba(255,255,255,.06);
+  }
+  .ft-inner{max-width:1400px;margin:0 auto}
+  .ft-top{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    gap:60px;
+  }
+  .ft-brand{display:flex;flex-direction:column;gap:12px}
+  .ft-logo{
+    font-family:"Geist",sans-serif;
+    font-size:28px;font-weight:600;letter-spacing:.08em;
+    color:#f1f1ef;
+  }
+  .ft-tagline{
+    font-family:"Geist Mono",monospace;
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:#555;
+  }
+  .ft-links{display:flex;gap:80px}
+  .ft-col{display:flex;flex-direction:column;gap:10px}
+  .ft-col-title{
+    font-family:"Geist Mono",monospace;
+    font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:4px;
+  }
+  .ft-col a, .ft-col span{
+    font-family:"Geist",sans-serif;
+    font-size:14px;color:#999;
+    text-decoration:none;
+    transition:color .2s;
+  }
+  .ft-col a:hover{color:#f1f1ef}
+  .ft-muted{color:#555 !important;font-size:12px !important;font-family:"Geist Mono",monospace !important;letter-spacing:.05em}
+  .ft-divider{
+    height:1px;background:rgba(255,255,255,.06);
+    margin:48px 0 24px;
+  }
+  .ft-bottom{
     display:flex;justify-content:space-between;
     font-family:"Geist Mono",monospace;
     font-size:10px;letter-spacing:.15em;text-transform:uppercase;
-    color:#555;
+    color:#444;
   }
-
   @media (max-width:780px){
-    .ct-main{grid-template-columns:1fr;gap:24px}
-    .ct-foot{flex-direction:column;gap:12px}
+    .ft-top{flex-direction:column;gap:40px}
+    .ft-links{flex-direction:column;gap:32px}
+    .ft-bottom{flex-direction:column;gap:8px}
   }
 
   /* ── Practices section (scroll-pop pills) ── */
@@ -1529,13 +1571,40 @@
   </div>
 
 
-  <!-- Bottom reverse marquee -->
-  <div class="ct-foot">
-    <span>© 2026 Blaziken Technologies</span>
-    <span>AI-Native · Founded in India</span>
-    <span>v5.0 · Build 2026.04</span>
-  </div>
 </section>
+
+<footer class="site-footer">
+  <div class="ft-inner">
+    <div class="ft-top">
+      <div class="ft-brand">
+        <span class="ft-logo">BLAZIKEN</span>
+        <p class="ft-tagline">AI-native systems. Founded in India.</p>
+      </div>
+      <div class="ft-links">
+        <div class="ft-col">
+          <div class="ft-col-title">Contact</div>
+          <a href="mailto:dev@blaziken.in">dev@blaziken.in</a>
+          <a href="tel:+917000065346">+91 70000 65346</a>
+        </div>
+        <div class="ft-col">
+          <div class="ft-col-title">Location</div>
+          <span>Mumbai, India</span>
+          <span class="ft-muted">Worldwide</span>
+        </div>
+        <div class="ft-col">
+          <div class="ft-col-title">Social</div>
+          <a href="#" target="_blank">LinkedIn</a>
+          <a href="#" target="_blank">Twitter</a>
+        </div>
+      </div>
+    </div>
+    <div class="ft-divider"></div>
+    <div class="ft-bottom">
+      <span>© 2026 Blaziken Technologies</span>
+      <span>v5.0 · Build 2026.04</span>
+    </div>
+  </div>
+</footer>
 
 <script>
 (() => {
