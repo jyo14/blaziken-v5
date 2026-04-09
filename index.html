@@ -540,36 +540,6 @@
   .ct-cta:hover svg{transform:translateX(6px);stroke:#0a0a0a}
 
   /* Detail grid */
-  .ct-details{
-    max-width:1400px;margin:0 auto;
-    display:grid;grid-template-columns:repeat(4,1fr);
-    gap:1px;background:rgba(255,255,255,.08);
-    border-top:1px solid rgba(255,255,255,.08);
-    border-bottom:1px solid rgba(255,255,255,.08);
-  }
-  .ct-detail{
-    background:#0a0a0a;padding:48px 32px;
-    opacity:0;transform:translateY(30px);
-    transition:opacity .8s ease, transform .9s cubic-bezier(.2,.8,.2,1);
-  }
-  .ct-details.show .ct-detail{opacity:1;transform:translateY(0)}
-  .ct-details.show .ct-detail:nth-child(1){transition-delay:.1s}
-  .ct-details.show .ct-detail:nth-child(2){transition-delay:.2s}
-  .ct-details.show .ct-detail:nth-child(3){transition-delay:.3s}
-  .ct-details.show .ct-detail:nth-child(4){transition-delay:.4s}
-  .ct-detail .lab{
-    font-family:"Geist Mono",monospace;
-    font-size:10px;letter-spacing:.15em;text-transform:uppercase;
-    color:#666;margin-bottom:18px;
-  }
-  .ct-detail .val{
-    font-family:"Geist",sans-serif;
-    font-size:20px;font-weight:500;letter-spacing:-.01em;
-    color:#f1f1ef;line-height:1.3;
-  }
-  .ct-detail .val a{color:inherit;text-decoration:none;border-bottom:1px solid transparent;transition:border-color .2s}
-  .ct-detail .val a:hover{border-color:var(--accent)}
-  .ct-detail .val small{display:block;font-size:13px;color:#666;font-weight:400;margin-top:4px;font-family:"Geist Mono",monospace;letter-spacing:.05em}
 
   .ct-foot{
     max-width:1400px;margin:60px auto 0;
@@ -581,7 +551,6 @@
 
   @media (max-width:780px){
     .ct-main{grid-template-columns:1fr;gap:24px}
-    .ct-details{grid-template-columns:1fr 1fr}
     .ct-foot{flex-direction:column;gap:12px}
   }
 
@@ -1559,25 +1528,6 @@
     </div>
   </div>
 
-  <!-- Detail grid -->
-  <div class="ct-details" id="ctDetails">
-    <div class="ct-detail">
-      <div class="lab">Email</div>
-      <div class="val"><a href="mailto:dev@blaziken.in">dev@blaziken.in</a></div>
-    </div>
-    <div class="ct-detail">
-      <div class="lab">Phone</div>
-      <div class="val"><a href="tel:+917000065346">+91 70000 65346</a></div>
-    </div>
-    <div class="ct-detail">
-      <div class="lab">Location</div>
-      <div class="val">Mumbai, India<small>Worldwide</small></div>
-    </div>
-    <div class="ct-detail">
-      <div class="lab">Social</div>
-      <div class="val"><a href="#" target="_blank">LinkedIn</a> &nbsp;/&nbsp; <a href="#" target="_blank">Twitter</a></div>
-    </div>
-  </div>
 
   <!-- Bottom reverse marquee -->
   <div class="ct-foot">
@@ -1590,7 +1540,6 @@
 <script>
 (() => {
   const title = document.getElementById('ctTitle');
-  const details = document.getElementById('ctDetails');
   if(!title) return;
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -1601,7 +1550,6 @@
     });
   }, { threshold: 0.3 });
   io.observe(title);
-  io.observe(details);
 
   // Slide-in form
   const section = document.querySelector('.contact');
